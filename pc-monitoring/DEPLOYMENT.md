@@ -25,12 +25,52 @@ PC 모니터링 서버 시작
 
 ### 2. 배포 파일 준비
 
-프로젝트의 `client/` 폴더에서 다음 파일들을 USB 또는 네트워크 공유로 준비:
+프로젝트의 `client/` 폴더를 SMB 공유 또는 USB에 준비:
 
 - ✅ `collect-info.ps1` - 정보 수집 스크립트
-- ✅ `setup-schedule.ps1` - 작업 스케줄러 자동 설정 스크립트
+- ✅ `quick-install.ps1` - 원클릭 설치 스크립트 (권장)
+- ✅ `install.bat` - 배치 파일 설치 스크립트
+- ✅ `setup-schedule.ps1` - 수동 설정용
 
-## 🚀 각 직원 PC에서 실행할 단계
+## 🚀 배포 방법
+
+### 방법 1: SMB 공유 사용 (권장, 가장 쉬움)
+
+서버 PC에서 `client/` 폴더를 SMB 공유로 설정한 후, 각 직원 PC에서:
+
+1. **PowerShell을 관리자 권한으로 실행**
+
+2. **다음 명령어 실행**:
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File "\\서버PC이름\공유폴더\client\quick-install.ps1"
+   ```
+
+   예시:
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File "\\SERVER01\PCMonitoring\client\quick-install.ps1"
+   ```
+
+3. **완료!** 스크립트가 자동으로:
+   - C:\Scripts 폴더 생성
+   - 필요한 파일 복사
+   - 작업 스케줄러 등록 (매일 12:00 PM)
+
+**장점**:
+- ✅ PowerShell 실행 정책 오류 없음
+- ✅ 한 줄 명령어로 완료
+- ✅ SMB 공유에서 직접 실행
+- ✅ 파일 복사 과정 불필요
+
+### 방법 2: 배치 파일 사용
+
+SMB 공유 또는 USB에서:
+
+1. `install.bat` 파일을 **관리자 권한으로 실행**
+2. 자동으로 설치 완료
+
+### 방법 3: 수동 설치
+
+## 🚀 각 직원 PC에서 실행할 단계 (수동 설치)
 
 ### 1단계: 스크립트 폴더 생성
 
