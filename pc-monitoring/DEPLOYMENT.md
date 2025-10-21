@@ -18,10 +18,10 @@ PC 모니터링 서버 시작
 ============================================================
 📊 대시보드:
    - Local:   http://localhost:5000
-   - Network: http://192.168.2.50:5000    ← 이 IP를 사용
+   - Network: http://192.168.2.76:5000    ← 이 IP를 사용
 ```
 
-**Network IP 주소**를 메모해두세요. (예: `192.168.2.50`)
+**Network IP 주소**를 메모해두세요. (예: `192.168.2.76`)
 
 ### 2. 배포 파일 준비
 
@@ -65,7 +65,7 @@ Copy-Item "\\ServerPC\share\client\*.ps1" -Destination "C:\Scripts\"
 
 ```powershell
 # 이 줄을 찾아서
-$serverUrl = "http://192.168.2.50:5000/api/report"
+$serverUrl = "http://192.168.2.76:5000/api/report"
 
 # 실제 서버 IP로 변경
 $serverUrl = "http://실제서버IP:5000/api/report"
@@ -131,7 +131,7 @@ Win + R → taskschd.msc
 - 프로그램/스크립트: `powershell.exe`
 - 인수 추가:
   ```
-  -WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\Scripts\collect-info.ps1" -ServerUrl "http://192.168.2.50:5000/api/report"
+  -WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\Scripts\collect-info.ps1" -ServerUrl "http://192.168.2.76:5000/api/report"
   ```
 
 **설정 탭:**
@@ -181,18 +181,18 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
 
 1. **네트워크 연결 확인**
    ```powershell
-   Test-NetConnection -ComputerName 192.168.2.50 -Port 5000
+   Test-NetConnection -ComputerName 192.168.2.76 -Port 5000
    ```
 
 2. **서버 접근 테스트**
    ```powershell
-   Invoke-WebRequest -Uri "http://192.168.2.50:5000" -UseBasicParsing
+   Invoke-WebRequest -Uri "http://192.168.2.76:5000" -UseBasicParsing
    ```
 
 3. **수동으로 스크립트 실행 테스트**
    ```powershell
    cd C:\Scripts
-   .\collect-info.ps1 -ServerUrl "http://192.168.2.50:5000/api/report"
+   .\collect-info.ps1 -ServerUrl "http://192.168.2.76:5000/api/report"
    ```
 
 ### Outlook 정보를 가져올 수 없음

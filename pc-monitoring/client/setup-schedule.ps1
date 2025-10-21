@@ -15,7 +15,7 @@ if (-not $isAdmin) {
 }
 
 # Server URL - modify this if your server IP is different
-$serverUrl = "http://192.168.2.50:5000/api/report"
+$serverUrl = "http://192.168.2.76:5000/api/report"
 
 Write-Host "Configuration:" -ForegroundColor Cyan
 Write-Host "  Script Path: C:\Scripts\collect-info.ps1"
