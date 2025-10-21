@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "context7-mcp": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@upstash/context7-mcp",
+        "--key",
+        "9394d24c-5f1f-4e11-871d-7959f9920789"
+      ]
+    }
+  }
+}
