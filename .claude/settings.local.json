@@ -11,7 +11,8 @@
       "Bash(gh --version:*)",
       "Bash(gh repo create:*)",
       "Bash(gh auth login:*)",
-      "Bash(schtasks /Create /TN \"PC Monitoring Collection\" /XML \"C:\\Scripts\\PC-Monitoring-Task.xml\" /F)"
+      "Bash(schtasks /Create /TN \"PC Monitoring Collection\" /XML \"C:\\Scripts\\PC-Monitoring-Task.xml\" /F)",
+      "Bash(git push:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
