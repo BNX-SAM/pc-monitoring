@@ -7,15 +7,18 @@
 ### 수집 정보
 - ✅ **스토리지 정보**: 각 드라이브의 전체/사용/여유 용량 및 사용률
 - ✅ **Outlook PST 파일**: PST 파일 위치, 크기, 최종 수정일
-- ✅ **메일 정보**: 받은편지함 전체 메일 수, 오늘 받은 메일 수
-- ✅ **기본 정보**: 컴퓨터명, 사용자명, IP 주소
+- ✅ **메일 정보**: 받은편지함 전체 메일 수, 특정 시간대 받은 메일 수 (토론토 시간대 지원)
+- ✅ **활성 이메일 계정**: Outlook에 설정된 모든 이메일 계정 정보
+- ✅ **아카이브 추적**: 마지막 아카이브 날짜 자동 감지 및 경고
+- ✅ **기본 정보**: 컴퓨터명, 사용자명 (Outlook 표시 이름), IP 주소
 
 ### 대시보드 기능
 - 📊 실시간 PC 현황 모니터링
-- ⚠️ 자동 경고 알림 (스토리지 80% 이상, PST 2GB 이상)
+- ⚠️ 자동 경고 알림 (스토리지 80% 이상, PST 2GB 이상, 아카이브 3개월+ 경과)
 - 📈 개별 PC 상세 정보 조회
 - 🔄 자동 새로고침 (30초마다)
 - 📱 반응형 디자인 (모바일/태블릿 지원)
+- ✏️ 사용자 이름 및 아카이브 날짜 수동 편집 가능
 
 ## 🚀 설치 방법
 
@@ -51,74 +54,87 @@ python app.py
 ============================================================
 PC 모니터링 서버 시작
 ============================================================
-📊 대시보드: http://localhost:5000
+📊 대시보드:
+   - Local:   http://localhost:5000
+   - Network: http://192.168.2.50:5000
+
 🔌 API 엔드포인트:
    - POST   /api/report                : 리포트 수신
    - GET    /api/reports/latest        : 최신 리포트 조회
    - GET    /api/reports/history/<pc>  : PC 히스토리 조회
    - GET    /api/statistics            : 통계 조회
    - GET    /api/alerts                : 경고 조회
+   - GET    /api/user-mappings         : 사용자 이름 매핑 조회
+   - PUT    /api/user-mappings/<pc>    : 사용자 이름 변경
+   - PUT    /api/archive-date/<pc>     : 아카이브 날짜 변경
    - POST   /api/cleanup               : 데이터 정리
 ============================================================
 ```
 
-#### (4) 대시보드 접속
-웹 브라우저에서 `http://localhost:5000` 접속
+#### (4) 데이터베이스 마이그레이션
+최초 설치 또는 업데이트 후 데이터베이스 스키마를 업데이트합니다:
+```bash
+cd pc-monitoring/server
+python migrate_db.py
+```
 
-같은 네트워크의 다른 PC에서 접속하려면:
-`http://서버IP주소:5000` (예: `http://192.168.1.100:5000`)
+#### (5) 대시보드 접속
+웹 브라우저에서:
+- 서버 PC: `http://localhost:5000`
+- 같은 네트워크의 다른 PC: `http://192.168.2.50:5000` (서버가 표시한 Network IP 사용)
 
 ### 3. 클라이언트 배포
 
-직원 PC에서 정보를 수집하는 방법은 3가지가 있습니다:
+직원 PC에서 정보를 수집하는 방법:
 
-#### 방법 1: 로그인 스크립트 (권장)
+#### (1) 스크립트 파일 복사
 
-1. `collect-info.ps1` 파일을 각 PC의 다음 위치에 복사:
-   ```
-   C:\Scripts\collect-info.ps1
-   ```
+`collect-info.ps1` 파일을 각 PC의 다음 위치에 복사:
+```
+C:\Scripts\collect-info.ps1
+```
 
-2. PowerShell 스크립트 생성 (`C:\Scripts\startup.ps1`):
+#### (2) 자동 실행 설정 (권장: 작업 스케줄러)
+
+1. **자동 설정 스크립트 사용** (간편):
+
+   `setup-schedule.ps1` 파일을 `C:\Scripts\`에 복사한 후, PowerShell을 **관리자 권한**으로 실행:
    ```powershell
-   # 서버 IP 주소를 실제 서버 IP로 변경
-   $serverUrl = "http://192.168.1.100:5000/api/report"
-
-   # 정보 수집 스크립트 실행
-   PowerShell.exe -ExecutionPolicy Bypass -File "C:\Scripts\collect-info.ps1" -ServerUrl $serverUrl
+   cd C:\Scripts
+   .\setup-schedule.ps1
    ```
 
-3. 시작 프로그램 폴더에 바로가기 생성:
-   - `Win + R` → `shell:startup` 입력
-   - 위에서 만든 `startup.ps1`의 바로가기를 이 폴더에 생성
+   이 스크립트는 자동으로 작업 스케줄러에 등록하여 **매일 오후 12시**에 데이터를 수집합니다.
 
-#### 방법 2: 작업 스케줄러 사용
+2. **수동 설정** (작업 스케줄러):
 
-1. 작업 스케줄러 실행 (`taskschd.msc`)
+   작업 스케줄러 실행 (`taskschd.msc`) 후 다음과 같이 설정:
 
-2. "작업 만들기" 클릭
-
-3. 설정:
    - **일반** 탭:
-     - 이름: "PC 정보 수집"
+     - 이름: "PC Monitoring Collection"
      - "가장 높은 수준의 권한으로 실행" 체크
 
    - **트리거** 탭:
-     - "새로 만들기" → "로그온할 때" 또는 "매일 오전 9시" 등 설정
+     - "새로 만들기" → "매일" 선택
+     - 시작 시간: 12:00 PM (또는 원하는 시간)
 
    - **동작** 탭:
-     - 프로그램: `PowerShell.exe`
+     - 프로그램: `powershell.exe`
      - 인수 추가:
        ```
-       -ExecutionPolicy Bypass -File "C:\Scripts\collect-info.ps1" -ServerUrl "http://192.168.1.100:5000/api/report"
+       -WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\Scripts\collect-info.ps1" -ServerUrl "http://192.168.2.50:5000/api/report"
        ```
 
-#### 방법 3: 수동 실행
+   - **설정** 탭:
+     - "배터리 사용 시 작업 중지" 해제
+     - "네트워크 연결 시에만 시작" 체크
+
+#### (3) 수동 실행 (테스트용)
 
 PowerShell을 관리자 권한으로 실행 후:
 ```powershell
 cd C:\Scripts
-.\collect-info.ps1 -ServerUrl "http://192.168.1.100:5000/api/report"
+.\collect-info.ps1 -ServerUrl "http://192.168.2.50:5000/api/report"
 ```
 
 ## 📊 사용 방법
@@ -143,8 +159,23 @@ cd C:\Scripts
 ### 경고 레벨
 
 - 🟢 **정상**: 모든 지표가 정상 범위
-- 🟡 **경고**: 스토리지 80-90% 또는 PST 2-5GB
-- 🔴 **위험**: 스토리지 90% 이상 또는 PST 5GB 이상
+- 🟡 **경고**: 스토리지 80-90% 또는 PST 2-5GB 또는 아카이브 90-180일 경과
+- 🔴 **위험**: 스토리지 90% 이상 또는 PST 5GB 이상 또는 아카이브 180일+ 경과
+
+### 아카이브 날짜 관리
+
+**자동 감지**:
+- 클라이언트 스크립트가 Outlook의 Archive 폴더에서 가장 최근 항목의 날짜를 자동으로 감지합니다.
+- 감지된 날짜는 서버로 전송되어 자동으로 저장됩니다.
+
+**수동 편집**:
+- 대시보드에서 각 PC 카드의 "Last Archive" 날짜를 클릭하여 수동으로 수정할 수 있습니다.
+- 날짜 형식: YYYY-MM-DD (예: 2025-01-15)
+
+**경고 기준**:
+- 🟢 90일 미만: 정상 (녹색)
+- 🟡 90-180일: 경고 (주황색) - 곧 아카이브 필요
+- 🔴 180일 이상: 위험 (빨간색) - 즉시 아카이브 필요
 
 ## 🔧 고급 설정
 
@@ -173,18 +204,27 @@ curl -X POST http://localhost:5000/api/cleanup?days=30
 
 ```
 pc-monitoring/
+├── .gitignore                  # Git 제외 파일 목록
+├── README.md                   # 프로젝트 문서
+│
 ├── client/
 │   └── collect-info.ps1        # PowerShell 정보 수집 스크립트
 │
 └── server/
     ├── app.py                  # Flask 웹 서버
     ├── database.py             # SQLite 데이터베이스 관리
-    ├── pc_monitoring.db        # SQLite 데이터베이스 파일 (자동 생성)
+    ├── migrate_db.py           # 데이터베이스 마이그레이션 스크립트
+    ├── requirements.txt        # Python 패키지 목록
+    ├── pc_monitoring.db        # SQLite 데이터베이스 파일 (자동 생성, Git 제외)
     ├── templates/
     │   └── dashboard.html      # 대시보드 HTML
     └── static/
         ├── style.css           # 스타일시트
         └── script.js           # JavaScript 로직
+
+추가 파일 (C:\Scripts\):
+├── collect-info.ps1            # 클라이언트 스크립트 (각 PC에 배포)
+└── setup-schedule.ps1          # 작업 스케줄러 자동 설정 스크립트
 ```
 
 ## 🐛 문제 해결
@@ -271,10 +311,20 @@ python app.py  # 자동으로 새 DB 생성
   "total_pst_size_gb": 1.5,
   "mail_info": {
     "total_emails": 5000,
-    "today_emails": 15,
+    "period_emails": 15,
     "inbox_size_mb": 250,
+    "last_archive_date": "2025-01-15 10:30:00",
     "status": "success"
-  }
+  },
+  "active_email_accounts": [
+    {
+      "display_name": "John Doe",
+      "email_address": "john.doe@company.com",
+      "account_type": 2
+    }
+  ],
+  "windows_user": "jdoe",
+  "last_archive_date": "2025-01-15 10:30:00"
 }
 ```
 

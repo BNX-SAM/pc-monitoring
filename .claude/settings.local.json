@@ -5,7 +5,13 @@
       "Bash(powershell:*)",
       "Read(//c/Scripts/**)",
       "Bash(python migrate_db.py:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git rm:*)",
+      "Bash(gh --version:*)",
+      "Bash(gh repo create:*)",
+      "Bash(gh auth login:*)",
+      "Bash(schtasks /Create /TN \"PC Monitoring Collection\" /XML \"C:\\Scripts\\PC-Monitoring-Task.xml\" /F)"
     ]
   },
   "enableAllProjectMcpServers": true,
