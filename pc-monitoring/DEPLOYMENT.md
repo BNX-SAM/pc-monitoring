@@ -32,113 +32,60 @@ PC 모니터링 서버 시작
 - ✅ `install.bat` - 배치 파일 설치 스크립트
 - ✅ `setup-schedule.ps1` - 수동 설정용
 
-## 🚀 배포 방법
+## 🚀 배포 방법 (권장)
 
-### 방법 1: SMB 공유 사용 (권장, 가장 쉬움)
+### 원클릭 설치 스크립트 사용
 
-서버 PC에서 `client/` 폴더를 SMB 공유로 설정한 후, 각 직원 PC에서:
+가장 쉽고 빠른 방법입니다.
 
-1. **PowerShell을 관리자 권한으로 실행**
+## 🚀 각 직원 PC에서 실행할 단계
 
-2. **다음 명령어 실행**:
-   ```powershell
-   powershell -ExecutionPolicy Bypass -File "\\서버PC이름\공유폴더\client\quick-install.ps1"
-   ```
+### 1단계: 파일 복사
 
-   예시:
-   ```powershell
-   powershell -ExecutionPolicy Bypass -File "\\SERVER01\PCMonitoring\client\quick-install.ps1"
-   ```
+프로젝트의 `client/` 폴더에서 다음 파일들을 `C:\Scripts\`로 복사:
 
-3. **완료!** 스크립트가 자동으로:
-   - C:\Scripts 폴더 생성
-   - 필요한 파일 복사
-   - 작업 스케줄러 등록 (매일 12:00 PM)
+- `collect-info.ps1`
+- `quick-install.ps1`
 
-**장점**:
-- ✅ PowerShell 실행 정책 오류 없음
-- ✅ 한 줄 명령어로 완료
-- ✅ SMB 공유에서 직접 실행
-- ✅ 파일 복사 과정 불필요
+**복사 방법**:
+- USB 드라이브 사용
+- 이메일로 전달
+- 네트워크 공유 폴더 사용
 
-### 방법 2: 배치 파일 사용
-
-SMB 공유 또는 USB에서:
-
-1. `install.bat` 파일을 **관리자 권한으로 실행**
-2. 자동으로 설치 완료
-
-### 방법 3: 수동 설치
-
-## 🚀 각 직원 PC에서 실행할 단계 (수동 설치)
-
-### 1단계: 스크립트 폴더 생성
-
-각 PC에서 PowerShell을 열고:
-
-```powershell
-# Scripts 폴더 생성
-New-Item -Path "C:\Scripts" -ItemType Directory -Force
-```
-
-### 2단계: 파일 복사
-
-두 가지 방법 중 선택:
-
-**방법 A: USB 또는 공유 폴더에서 복사**
-
-```powershell
-# USB가 E: 드라이브라고 가정
-Copy-Item "E:\client\*.ps1" -Destination "C:\Scripts\"
-```
-
-**방법 B: 네트워크 경로에서 복사**
-
-```powershell
-# 서버 PC의 공유 폴더에서 복사
-Copy-Item "\\ServerPC\share\client\*.ps1" -Destination "C:\Scripts\"
-```
-
-### 3단계: 서버 URL 수정
-
-`C:\Scripts\setup-schedule.ps1` 파일을 텍스트 에디터로 열고 서버 IP를 수정:
-
-```powershell
-# 이 줄을 찾아서
-$serverUrl = "http://192.168.2.76:5000/api/report"
-
-# 실제 서버 IP로 변경
-$serverUrl = "http://실제서버IP:5000/api/report"
-```
-
-### 4단계: 작업 스케줄러 설정
+### 2단계: 설치 실행
 
 PowerShell을 **관리자 권한으로 실행** 후:
 
 ```powershell
 cd C:\Scripts
-.\setup-schedule.ps1
+powershell -ExecutionPolicy Bypass -File ".\quick-install.ps1"
 ```
 
-스크립트가 다음을 자동으로 수행합니다:
+**완료!** 스크립트가 자동으로:
 - ✅ 작업 스케줄러에 "PC Monitoring Collection" 작업 등록
 - ✅ 매일 오후 12:00에 자동 실행 설정
 - ✅ 네트워크 연결 시에만 실행
 - ✅ 숨김 모드로 백그라운드 실행
 
-### 5단계: 테스트 실행
+### 3단계: 테스트 실행
 
 설정 스크립트가 완료되면 테스트 실행 여부를 물어봅니다:
 
 ```
-Do you want to test run the task now? (Y/N)
+Do you want to test run now? (Y/N)
 ```
 
 `Y`를 입력하면 즉시 실행되어 서버로 데이터가 전송됩니다.
 
-### 6단계: 서버에서 확인
+### 4단계: 서버에서 확인
 
-서버 대시보드(`http://서버IP:5000`)에 접속하여 해당 PC가 나타나는지 확인합니다.
+서버 대시보드(`http://192.168.2.76:5000`)에 접속하여 해당 PC가 나타나는지 확인합니다.
+
+---
+
+## 💡 참고: PowerShell 실행 정책 오류가 발생하는 경우
+
+위의 방법을 사용하면 실행 정책 오류가 발생하지 않습니다. `-ExecutionPolicy Bypass` 옵션이 포함되어 있기 때문입니다.
 
 ## 🔧 수동 설정 (고급 사용자)
 

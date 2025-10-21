@@ -2,7 +2,7 @@
 # Run with Administrator privileges
 
 param(
-    [string]$ServerUrl = "http://localhost:5000/api/report"
+    [string]$ServerUrl = "http://192.168.2.76:5000/api/report"
 )
 
 # Script start log
